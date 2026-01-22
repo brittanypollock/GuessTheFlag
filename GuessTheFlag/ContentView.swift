@@ -10,9 +10,13 @@ import SwiftUI
 struct ContentView: View {
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Spain", "UK", "Ukraine", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
-    
     @State private var showingScore = false
+    @State private var gameOver = false
     @State private var scoreTitle = ""
+    
+    @State private var turns = 1
+    @State private var scorePoint = 0
+    @State private var scoreBody = ""
     
     var body: some View {
         ZStack {
@@ -57,26 +61,55 @@ struct ContentView: View {
                 Spacer()
                 Spacer()
                 
-                Text("Score: ???")
+                Text("Score: \(scorePoint)")
                     .foregroundStyle(.white)
                     .font(.title.bold())
                 
+                Text("Turn: \(turns)/8")
+                    .foregroundStyle(.white)
+                    .font(.headline.bold())
+                
                 Spacer()
+                
             }
             .padding()
         }
         .alert(scoreTitle, isPresented: $showingScore) {
             Button("Continue", action: askQuestion)
         } message: {
-            Text("Your score is ???")
+            Text(scoreBody)
         }
+        
+        .alert(scoreTitle, isPresented: $gameOver) {
+            Button("Reset", action: reset)
+                .buttonStyle(.borderedProminent)
+        } message: {
+            Text(scoreBody)
+        }
+    }
+    
+    func reset() {
+        turns = 1
+        scorePoint = 0
     }
     
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
+            scorePoint += 1
+            scoreBody = "Your score is \(scorePoint)"
         } else {
             scoreTitle = "Incorrect"
+            scoreBody = "That's \(countries[number])'s flag."
+        }
+        
+        turns += 1
+        
+        if turns == 8 {
+            scoreTitle = "Game Over"
+            scoreBody = "Your score was \(scorePoint)."
+            gameOver = true
+            return
         }
         
         showingScore = true
