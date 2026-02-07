@@ -18,12 +18,14 @@ struct ContentView: View {
     @State private var scorePoint = 0
     @State private var scoreBody = ""
     
+    @State private var tappedFlag = -1
+    
     var body: some View {
         ZStack {
             RadialGradient(stops: [
                 .init(color: Color(red: 0.1, green: 0.2, blue: 0.45), location: 0.3),
                 .init(color: Color(red: 0.76, green: 0.15, blue: 0.26), location: 0.3)
-                ], center: .top, startRadius: 200, endRadius: 700)                .ignoresSafeArea()
+            ], center: .top, startRadius: 200, endRadius: 700)                .ignoresSafeArea()
             VStack {
                 Spacer()
                 
@@ -49,6 +51,12 @@ struct ContentView: View {
                         } label: {
                             FlagImage(country: countries[number])
                         }
+                        
+                        .rotation3DEffect(.degrees(tappedFlag == number ? 360 : 0), axis: (x: 0, y: 1, z: 0))
+                        .opacity(tappedFlag == -1 || tappedFlag == number ? 1.0 : 0.25)
+                        .saturation(tappedFlag == -1 || tappedFlag == number ? 1.0 : 0.0 )
+                        .animation(.default, value: tappedFlag)
+                        
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -102,6 +110,7 @@ struct ContentView: View {
         }
         
         turns += 1
+        tappedFlag = number
         
         if turns == 8 {
             scoreTitle = "Game Over"
@@ -116,6 +125,7 @@ struct ContentView: View {
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        tappedFlag = -1
     }
 }
 
